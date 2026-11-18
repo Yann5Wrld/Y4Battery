@@ -4,6 +4,9 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     # ubuntu-24.04 contient déjà le SDK Android
@@ -29,3 +32,11 @@ jobs:
         with:
           name: Y4Battery-apk
           path: app/build/outputs/apk/debug/*.apk
+
+      - name: Publier l'APK (lien direct)
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk Y4Battery.apk
+          gh release delete latest -y --cleanup-tag || true
+          gh release create latest Y4Battery.apk --title "Y4 Battery" --notes "APK de la dernière version" --latest
+        env:
+          GH_TOKEN: ${{ github.token }}
